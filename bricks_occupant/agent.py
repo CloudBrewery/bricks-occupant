@@ -20,5 +20,8 @@ def monitor_workers():
         gevent.sleep(1)
 
 
-if __name__ == '__main__':
+def main():
     gevent.spawn(monitor_workers)
+
+if __name__ == '__main__':
+    main()
