@@ -1,5 +1,4 @@
 import sys
-import time
 
 import gevent
 from gevent.subprocess import Popen, PIPE
@@ -11,7 +10,6 @@ def monitor_workers():
     """
 
     workers = []
-
     while True:
         for w in workers:
             if w.returncode is not None:
@@ -24,9 +22,8 @@ def monitor_workers():
 
 
 def main():
-    while True:
-        gevent.spawn(monitor_workers)
-        time.sleep(0.1)
+    thread = gevent.spawn(monitor_workers)
+    thread.join()
 
 if __name__ == '__main__':
     try:
@@ -34,3 +31,4 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         print >> sys.stderr, '\nExiting by user request.\n'
         sys.exit(0)
+
