@@ -23,7 +23,7 @@ class Serial(object):
         """
         Receives our file from serial
         """
-        serial = io.open(self.path, timeout=30)
+        serial = io.open(self.path)
 
         while True:
             try:
