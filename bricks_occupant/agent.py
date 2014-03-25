@@ -1,3 +1,6 @@
+import sys
+import time
+
 import gevent
 from gevent.subprocess import Popen, PIPE
 
@@ -21,7 +24,13 @@ def monitor_workers():
 
 
 def main():
-    gevent.spawn(monitor_workers)
+    while True:
+        gevent.spawn(monitor_workers)
+        time.sleep(0.1)
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print >> sys.stderr, '\nExiting by user request.\n'
+        sys.exit(0)
