@@ -17,7 +17,7 @@ def monitor_workers():
                 workers.remove(w)
 
         if len(workers) < 1:
-            script_path = bricks_occupant.serialserver.__file__
+            script_path = re.sub(r'c$', "", bricks_occupant.serialserver.__file__)
             sub = Popen([script_path],
                         stdout=PIPE, shell=True)
             workers.append(sub)
