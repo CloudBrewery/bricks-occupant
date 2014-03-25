@@ -1,5 +1,6 @@
 import sys
 
+import bricks_occupant
 import gevent
 from gevent.subprocess import Popen, PIPE
 
@@ -16,7 +17,9 @@ def monitor_workers():
                 workers.remove(w)
 
         if len(workers) < 1:
-            sub = Popen(['python serialserver.py'], stdout=PIPE, shell=True)
+            working_dir = bricks_occupant.__path__
+            sub = Popen(['python %s/serialserver.py' % working_dir],
+            stdout=PIPE, shell=True)
             workers.append(sub)
         gevent.sleep(1)
 
