@@ -1,6 +1,11 @@
+import dockerstack_agent
 import io
+import os
 import re
 from uuid import uuid4
+
+
+TMP_DIR = "/tmp/dockerstack/"
 
 
 class Serial(object):
@@ -10,6 +15,7 @@ class Serial(object):
 
     path = None
     contents = None
+    directory = None
     file_name = None
 
     def __init__(self, path='/dev/virtio-ports/org.clouda.0'):
@@ -17,7 +23,10 @@ class Serial(object):
         Initialize socket connection
         """
         self.path = path
-        self.file_name = uuid4()
+        self.directory = os.path.join(TMP_DIR, uuid4())
+
+        if not os.path.exists(self.directory):
+            os.makedirs(self.directory)
 
     def read(self):
         """
@@ -29,10 +38,17 @@ class Serial(object):
             try:
                 line = serial.readline()
 
-                #Stop reading if we've reached the end of the file
-                if re.match('EOF\n', line):
+                #Stop reading if we've reached the end of the stream
+                if re.match('StopStream\n', line):
                     break
-                elif re.match('BOF\n', line):
+                #Write our file if we've reached EOF and clear our buffer
+                elif re.match('EOF\n', line):
+                    self.write_contents()
+                    self.contents = ""
+                elif re.match(r'BOF [a-z0-9._-]+\n', line):
+                    self.file_name = re.sub("\n", "", line[5:])
+                    self.contents = ""
+                elif re.match('StartStream\n', line):
                     self.contents = ""
                 else:
                     self.contents += serial.readline()
@@ -49,5 +65,23 @@ class Serial(object):
         """
         Write contents to file
         """
-        dfile = open('/tmp/dockerstack/%s' % self.file_name, 'w')
+        dfile = open(os.path.join(self.directory, self.file_name), "w")
         dfile.write(self.contents)
+
+
+def find_docker_files():
+    """
+    Find docker files
+    """
+    os.chdir(TMP_DIR)
+    docker_dirs = filter(os.path.isdir, os.listdir(TMP_DIR))
+    docker_dirs = [os.path.join(TMP_DIR, d) for d in docker_dirs]
+    docker_dirs.sort(key=lambda x: os.path.getmtime(x))
+
+    return docker_dirs
+
+def proc_docker_file(directory):
+    """
+    Process a dockerfile directory
+    """
+    dockerstack_agent.builder.do_build(directory)

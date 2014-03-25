@@ -1,5 +1,6 @@
 argparse==1.2.1
 distribute==0.6.24
+git+ssh://git@bitbucket.org/clouda/dockerstack.git#egg=dockerstack_agent
 gevent==1.0
 greenlet==0.4.2
 wsgiref==0.1.2
