@@ -42,8 +42,8 @@ class Serial(object):
                 elif re.match('EOF\n', line):
                     self.write_contents()
                     self.contents = ""
-                elif re.match(r'BOF [a-z0-9._-]+\n', line):
-                    self.file_name = re.sub("\n", "", line[5:])
+                elif re.match(r'BOF [a-zA-Z0-9._-]+\n', line):
+                    self.file_name = re.sub("\n", "", line[4:])
                     self.contents = ""
                 #Generate a filename if invalid pattern or none given
                 elif re.match('BOF', line):
