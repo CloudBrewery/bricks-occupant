@@ -2,6 +2,8 @@ import dockerstack_agent.builder
 import io
 import os
 import re
+import traceback
+
 from shutil import rmtree
 from uuid import uuid4
 
@@ -90,10 +92,12 @@ def proc_docker_file(directory):
     """
     Process a dockerfile directory
     """
-    directory = os.rename(directory, directory + "_working")
+    os.rename(directory, directory + "_working")
+    directory += "_working"
     try:
         dockerstack_agent.builder.do_build(directory)
     except Exception as e:
+        traceback.print_exc()
         raise e
     finally:
         #Remove the directory
