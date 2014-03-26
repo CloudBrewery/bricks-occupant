@@ -40,21 +40,21 @@ class Serial(object):
 
                 #Stop reading if we've reached the end of the stream and mark
                 #directory as ready
-                if re.match('StopStream\n', line):
+                if re.search('StopStream\n', line):
                     os.rename(self.directory, self.directory[:-8])
                     break
                 #Write our file if we've reached EOF and clear our buffer
-                elif re.match('EOF\n', line):
+                elif re.search('EOF\n', line):
                     self.write_contents()
                     self.contents = ""
-                elif re.match(r'BOF [a-zA-Z0-9._-]+\n', line):
+                elif re.search(r'BOF [a-zA-Z0-9._-]+\n', line):
                     self.file_name = re.sub("\n", "", line[4:])
                     self.contents = ""
                 #Generate a filename if invalid pattern or none given
-                elif re.match('BOF', line):
+                elif re.search('BOF', line):
                     self.file_name = str(uuid4())
                     self.contents = ""
-                elif re.match('StartStream\n', line):
+                elif re.search('StartStream\n', line):
                     if not os.path.exists(self.directory):
                         os.makedirs(self.directory)
                     self.contents = ""
