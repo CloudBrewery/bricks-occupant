@@ -2,7 +2,7 @@ import re
 import sys
 
 import gevent
-from bricks_occupant import serialserver, util
+from bricks_occupant import serialserver, util, seriallogger
 from gevent.subprocess import Popen, PIPE
 
 
@@ -52,6 +52,8 @@ def periodic_tasks():
 
 
 def main():
+    sys.stdout = seriallogger.VirtIOLogger()
+    sys.stderr = seriallogger.VirtIOLogger()
     worker_thread = gevent.spawn(monitor_workers)
     periodic_task_thread = gevent.spawn(periodic_tasks)
     gevent.joinall([worker_thread, periodic_task_thread])
