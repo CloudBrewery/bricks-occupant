@@ -40,13 +40,13 @@ def periodic_tasks():
             print "done."
 
             # Let's just process one dockerstack repo at a time
-            print "Processing dockerfile"
             if len(docker_dirs) > 0:
+                print "Processing dockerfile"
                 print "---%s" % docker_dirs[0]
                 util.proc_docker_file(docker_dirs[0])
-            print "done."
-        except:
-            pass
+                print "done."
+        except Exception as e:
+            print e.message
 
         gevent.sleep(15)
 

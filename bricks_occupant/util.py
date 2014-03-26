@@ -2,6 +2,7 @@ import dockerstack_agent
 import io
 import os
 import re
+from shutil import rmtree
 from uuid import uuid4
 
 
@@ -89,5 +90,11 @@ def proc_docker_file(directory):
     """
     Process a dockerfile directory
     """
-    directory = os.rename(directory, directory[:-1] + "_working")
-    dockerstack_agent.builder.do_build(directory)
+    directory = os.rename(directory, directory + "_working")
+    try:
+        dockerstack_agent.builder.do_build(directory)
+    except Exception as e:
+        raise e
+    finally:
+        #Remove the directory
+        rmtree(directory)
