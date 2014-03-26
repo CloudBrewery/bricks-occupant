@@ -33,20 +33,20 @@ def periodic_tasks():
     """
 
     while True:
-        docker_dirs = []
         try:
+            docker_dirs = []
             print "Scanning for dockerfiles..."
             docker_dirs = util.find_docker_files()
+            print "done."
+
+            # Let's just process one dockerstack repo at a time
+            print "Processing dockerfile"
+            if len(docker_dirs) > 0:
+                print "---%s" % docker_dirs[0]
+                util.proc_docker_file(docker_dirs[0])
+            print "done."
         except:
             pass
-        print "done."
-
-        # Let's just process one dockerstack repo at a time
-        print "Processing dockerfile"
-        if len(docker_dirs) > 0:
-            print "---%s" % docker_dirs[0]
-            util.proc_docker_file(docker_dirs[0])
-        print "done."
 
         gevent.sleep(15)
 
