@@ -1,4 +1,4 @@
-import dockerstack_agent
+import dockerstack_agent.builder
 import io
 import os
 import re
