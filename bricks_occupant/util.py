@@ -88,4 +88,5 @@ def proc_docker_file(directory):
     """
     Process a dockerfile directory
     """
+    directory = os.rename(directory, directory[:-1] + "_working")
     dockerstack_agent.builder.do_build(directory)

@@ -23,12 +23,38 @@ def monitor_workers():
             sub = Popen(["python %s" % script_path],
                         stdout=PIPE, shell=True)
             workers.append(sub)
+
         gevent.sleep(1)
 
 
+def periodic_tasks():
+    """
+    Runs our dockerfile scan every 15s
+    """
+
+    while True:
+        docker_dirs = []
+        try:
+            print "Scanning for dockerfiles..."
+            docker_dirs = util.find_docker_files()
+        except:
+            pass
+        print "done."
+
+        # Let's just process one dockerstack repo at a time
+        print "Processing dockerfile"
+        if len(docker_dirs) > 0:
+            print "---%s" % docker_dirs[0]
+            util.proc_docker_file(docker_dirs[0])
+        print "done."
+
+        gevent.sleep(15)
+
+
 def main():
-    thread = gevent.spawn(monitor_workers)
-    thread.join()
+    worker_thread = gevent.spawn(monitor_workers)
+    periodic_task_thread = gevent.spawn(periodic_tasks)
+    gevent.joinall([worker_thread, periodic_task_thread])
 
 if __name__ == '__main__':
     try:
@@ -36,4 +62,3 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         print >> sys.stderr, '\nExiting by user request.\n'
         sys.exit(0)
-
