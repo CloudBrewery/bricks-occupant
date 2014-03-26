@@ -25,9 +25,6 @@ class Serial(object):
         self.path = path
         self.directory = os.path.join(TMP_DIR, str(uuid4()))
 
-        if not os.path.exists(self.directory):
-            os.makedirs(self.directory)
-
     def read(self):
         """
         Receives our file from serial
@@ -53,6 +50,8 @@ class Serial(object):
                     self.file_name = str(uuid4())
                     self.contents = ""
                 elif re.match('StartStream\n', line):
+                    if not os.path.exists(self.directory):
+                        os.makedirs(self.directory)
                     self.contents = ""
                 else:
                     self.contents += serial.readline()
