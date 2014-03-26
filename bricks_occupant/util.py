@@ -23,7 +23,7 @@ class Serial(object):
         Initialize socket connection
         """
         self.path = path
-        self.directory = os.path.join(TMP_DIR, uuid4())
+        self.directory = os.path.join(TMP_DIR, str(uuid4()))
 
         if not os.path.exists(self.directory):
             os.makedirs(self.directory)
