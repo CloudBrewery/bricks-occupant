@@ -1,14 +1,15 @@
 import re
 import sys
 
-import bricks_occupant.serialserver
 import gevent
+from bricks_occupant import serialserver, util
 from gevent.subprocess import Popen, PIPE
 
 
 def monitor_workers():
     """
-    Starts our serial server and ensures that it stays up
+    Starts our serial server and ensures that it stays up.
+    Also, looks for new Dockerfile dirs and processes them.
     """
 
     workers = []
@@ -18,7 +19,7 @@ def monitor_workers():
                 workers.remove(w)
 
         if len(workers) < 1:
-            script_path = re.sub(r'c$', "", bricks_occupant.serialserver.__file__)
+            script_path = re.sub(r'c$', "", serialserver.__file__)
             sub = Popen(["python %s" % script_path],
                         stdout=PIPE, shell=True)
             workers.append(sub)

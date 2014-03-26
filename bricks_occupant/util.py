@@ -23,7 +23,7 @@ class Serial(object):
         Initialize socket connection
         """
         self.path = path
-        self.directory = os.path.join(TMP_DIR, str(uuid4()))
+        self.directory = os.path.join(TMP_DIR, str(uuid4()) + "_working")
 
     def read(self):
         """
@@ -35,8 +35,10 @@ class Serial(object):
             try:
                 line = serial.readline()
 
-                #Stop reading if we've reached the end of the stream
+                #Stop reading if we've reached the end of the stream and mark
+                #directory as ready
                 if re.match('StopStream\n', line):
+                    os.rename(self.directory, self.directory[:-8])
                     break
                 #Write our file if we've reached EOF and clear our buffer
                 elif re.match('EOF\n', line):
@@ -76,9 +78,8 @@ def find_docker_files():
     """
     Find docker files
     """
-    os.chdir(TMP_DIR)
-    docker_dirs = filter(os.path.isdir, os.listdir(TMP_DIR))
-    docker_dirs = [os.path.join(TMP_DIR, d) for d in docker_dirs]
+    docker_dirs = [os.path.join(TMP_DIR, d) for d in os.listdir(
+        TMP_DIR) if os.path.isdir(d) and not d.endswith("_working")]
     docker_dirs.sort(key=lambda x: os.path.getmtime(x))
 
     return docker_dirs
