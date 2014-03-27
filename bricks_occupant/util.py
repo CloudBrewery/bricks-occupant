@@ -60,7 +60,7 @@ class Serial(object):
                         os.makedirs(self.directory)
                     self.contents = ""
                 else:
-                    self.contents += serial.readline()
+                    self.contents += line
             except:
                 break
 
