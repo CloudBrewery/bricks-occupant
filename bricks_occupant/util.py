@@ -1,4 +1,3 @@
-import dockerstack_agent.builder
 import io
 import os
 import re
@@ -7,13 +6,16 @@ import traceback
 from shutil import rmtree
 from uuid import uuid4
 
+import dockerstack_agent.builder
 
-TMP_DIR = "/tmp/dockerstack/"
+
+TMP_DIR = '/tmp/dockerstack/'
+SERIAL_PATH = '/dev/virtio-ports/org.clouda.0'
 
 
 class Serial(object):
-    """
-    A serial object used for receiving file data from Mortar etc.
+
+    """A serial object used for receiving file data from Mortar etc.
     """
 
     path = None
@@ -21,17 +23,16 @@ class Serial(object):
     directory = None
     file_name = None
 
-    def __init__(self, path='/dev/virtio-ports/org.clouda.0'):
-        """
-        Initialize socket connection
+    def __init__(self, path=SERIAL_PATH):
+        """Initialize socket connection.
         """
         self.path = path
         self.directory = os.path.join(TMP_DIR, str(uuid4()) + "_working")
 
     def read(self):
+        """Receives files from serial port
         """
-        Receives our file from serial
-        """
+
         serial = io.open(self.path)
 
         while True:
@@ -78,19 +79,20 @@ class Serial(object):
 
 
 def find_docker_files():
+    """Finds docker files in the working tmp dir.
     """
-    Find docker files
-    """
-    docker_dirs = [os.path.join(TMP_DIR, d) for d in os.listdir(TMP_DIR) \
-                   if os.path.isdir(os.path.join(TMP_DIR, d)) and \
+    docker_dirs = [os.path.join(TMP_DIR, d) for d in os.listdir(TMP_DIR)
+                   if os.path.isdir(os.path.join(TMP_DIR, d)) and
                    not d.endswith("_working")]
     docker_dirs.sort(key=lambda x: os.path.getmtime(x))
 
     return docker_dirs
 
+
 def proc_docker_file(directory):
-    """
-    Process a dockerfile directory
+    """Process a dockerfile directory.
+
+    :param directory: The target directory for dockerstack agent.
     """
     os.rename(directory, directory + "_working")
     directory += "_working"
