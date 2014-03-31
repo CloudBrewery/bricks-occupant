@@ -94,17 +94,17 @@ def proc_docker_file(directory):
 
     :param directory: The target directory for dockerstack agent.
     """
-    print "RUNNING"
+    print "TASK-RUNNING"
     os.rename(directory, directory + "_working")
     directory += "_working"
     try:
         dockerstack_agent.builder.do_build(directory)
     except Exception as e:
         traceback.print_exc()
-        print "ERROR"
+        print "TASK-ERROR"
         raise e
     finally:
         #Remove the directory
         rmtree(directory)
 
-    print "COMPLETE"
+    print "TASK-COMPLETE"
