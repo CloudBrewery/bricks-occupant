@@ -3,7 +3,7 @@ import sys
 
 import gevent
 from bricks_occupant import serialserver, util, seriallogger
-from gevent.subprocess import Popen, PIPE
+from gevent.subprocess import Popen, PIPE, STDOUT
 
 
 def monitor_workers():
@@ -21,7 +21,7 @@ def monitor_workers():
         if len(workers) < 1:
             script_path = re.sub(r'c$', "", serialserver.__file__)
             sub = Popen(["python %s" % script_path],
-                        stdout=PIPE, shell=True)
+                        stdout=STDOUT, stderr=STDOUT, shell=True)
             workers.append(sub)
 
         gevent.sleep(1)
