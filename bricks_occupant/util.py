@@ -81,10 +81,12 @@ class Serial(object):
 def find_docker_files():
     """Finds docker files in the working tmp dir.
     """
-    docker_dirs = [os.path.join(TMP_DIR, d) for d in os.listdir(TMP_DIR)
-                   if os.path.isdir(os.path.join(TMP_DIR, d)) and
-                   not d.endswith("_working")]
-    docker_dirs.sort(key=lambda x: os.path.getmtime(x))
+    docker_dirs = []
+    if os.path.exists(TMP_DIR):
+        docker_dirs = [os.path.join(TMP_DIR, d) for d in os.listdir(TMP_DIR)
+                       if os.path.isdir(os.path.join(TMP_DIR, d)) and
+                       not d.endswith("_working")]
+        docker_dirs.sort(key=lambda x: os.path.getmtime(x))
 
     return docker_dirs
 
