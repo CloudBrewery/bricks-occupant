@@ -68,7 +68,7 @@ class Serial(object):
                 else:
                     self.contents += line
             except:
-                break
+                pass
 
     def get_contents(self):
         """
