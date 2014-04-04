@@ -1,4 +1,5 @@
 import re
+import signal
 import sys
 
 import gevent
@@ -13,18 +14,26 @@ def monitor_workers():
     """
 
     workers = []
-    while True:
+
+    keep_processing = True
+
+    while keep_processing:
         for w in workers:
             if w.returncode is not None:
+                print "Alienating returned worker"
                 workers.remove(w)
 
         if len(workers) < 1:
+            print "Starting new worker"
             script_path = re.sub(r'c$', "", serialserver.__file__)
             sub = Popen(["python %s" % script_path],
                         stdout=PIPE, stderr=PIPE, shell=True)
             workers.append(sub)
 
-        gevent.sleep(1)
+        gevent.sleep(2)
+
+    for w in workers:
+        w.kill()
 
 
 def periodic_tasks():
@@ -56,6 +65,15 @@ def main():
     sys.stderr = seriallogger.VirtIOLogger()
     worker_thread = gevent.spawn(monitor_workers)
     periodic_task_thread = gevent.spawn(periodic_tasks)
+
+    def stop(signal, frame):
+        worker_thread.kill()
+        periodic_task_thread.kill()
+        sys.exit()
+
+    signal.signal(signal.SIGINT, stop)
+    signal.signal(signal.SIGTERM, stop)
+
     gevent.joinall([worker_thread, periodic_task_thread])
 
 if __name__ == '__main__':

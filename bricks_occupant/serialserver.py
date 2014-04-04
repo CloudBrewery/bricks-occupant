@@ -1,5 +1,9 @@
 from bricks_occupant.util import Serial
 
-if __name__ == '__main__':
+
+def main():
     serial = Serial()
     serial.read()
+
+if __name__ == '__main__':
+    main()
