@@ -81,7 +81,7 @@ class Serial(object):
         Write contents to file
         """
         dfile = open(os.path.join(self.directory, self.file_name), "w")
-        dfile.write(self.contents)
+        dfile.write(self.contents.strip())
 
 
 def find_docker_files():
