@@ -41,6 +41,8 @@ def periodic_tasks():
     Runs our dockerfile scan every 15s
     """
 
+    print "Initializing dockerfile scan..."
+
     while True:
         try:
             docker_dirs = []
