@@ -1,6 +1,7 @@
 import io
 import os
 import re
+import time
 import traceback
 
 from shutil import rmtree
@@ -18,16 +19,14 @@ class Serial(object):
     """A serial object used for receiving file data from Mortar etc.
     """
 
-    path = None
-    contents = None
-    directory = None
-    file_name = None
-
     def __init__(self, path=SERIAL_PATH):
         """Initialize socket connection.
         """
+        self.contents = ''
+        self.file_name = None
+
         self.path = path
-        self.directory = os.path.join(TMP_DIR, str(uuid4()) + "_working")
+        self.directory = os.path.join(TMP_DIR, str(uuid4()) + '_working')
 
     def read(self):
         """Receives files from serial port
@@ -35,9 +34,12 @@ class Serial(object):
 
         serial = io.open(self.path)
 
+        on_line = False
+
         while True:
             try:
                 line = serial.readline()
+                on_line = line != ''
 
                 #Stop reading if we've reached the end of the stream and mark
                 #directory as ready
@@ -49,30 +51,32 @@ class Serial(object):
                 elif re.match(r'(\n*)EOF\n', line):
                     print "Done creating file."
                     self.write_contents()
-                    self.contents = ""
+                    self.contents = ''
                 elif re.match(r'(\n*)BOF [a-zA-Z0-9._-]+\n', line):
-                    self.file_name = re.sub("\n", "", line[4:])
+                    self.file_name = re.sub('\n', '', line[4:])
                     print "Creating file %s" % self.file_name
-                    self.contents = ""
+                    self.contents = ''
                 #Generate a filename if invalid pattern or none given
                 elif re.match(r'(\n*)BOF', line):
                     print "Creating file with random name..."
                     self.file_name = str(uuid4())
-                    self.contents = ""
+                    self.contents = ''
                 elif re.match(r'(\n*)StartStream\n', line):
                     print "Streaming...."
                     if not os.path.exists(self.directory):
                         print "Creating directory %s" % self.directory
                         os.makedirs(self.directory)
-                    self.contents = ""
+                    self.contents = ''
                 else:
                     self.contents += line
+
+                if not on_line:
+                    time.sleep(2)
             except:
                 pass
 
     def get_contents(self):
-        """
-        Returns the contents of the file
+        """Returns the contents of the file.
         """
         return self.contents
 
@@ -80,7 +84,7 @@ class Serial(object):
         """
         Write contents to file
         """
-        dfile = open(os.path.join(self.directory, self.file_name), "w")
+        dfile = open(os.path.join(self.directory, self.file_name), 'w')
         dfile.write(self.contents.strip())
 
 
@@ -91,7 +95,7 @@ def find_docker_files():
     if os.path.exists(TMP_DIR):
         docker_dirs = [os.path.join(TMP_DIR, d) for d in os.listdir(TMP_DIR)
                        if os.path.isdir(os.path.join(TMP_DIR, d)) and
-                       not d.endswith("_working")]
+                       not d.endswith('_working')]
         docker_dirs.sort(key=lambda x: os.path.getmtime(x))
 
     return docker_dirs
@@ -103,8 +107,8 @@ def proc_docker_file(directory):
     :param directory: The target directory for dockerstack agent.
     """
     print "TASK-RUNNING"
-    os.rename(directory, directory + "_working")
-    directory += "_working"
+    os.rename(directory, directory + '_working')
+    directory += '_working'
     try:
         dockerstack_agent.builder.do_build(directory)
         rmtree(directory)
