@@ -13,9 +13,9 @@ setup(
     name='bricks_occupant',
     description='Bricks guest agent',
     long_description='',
-    author='Cloud A',
-    author_email='info@clouda.ca',
-    url='https://bitbucket.org/clouda/bricks-occupant',
+    author='Cloud Brewery',
+    author_email='info@cloudbrewery.io',
+    url='https://github.com/cloudbrewery/bricks-occupant',
     packages=packages,
     scripts=['bin/bricks_occupant'],
     classifiers=(
